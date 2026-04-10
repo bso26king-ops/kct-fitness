@@ -1,0 +1,14 @@
+KCT FITNESS BACKEND - COMPLETE FILE MANIFEST
+=============================================
+
+PROJECT STRUCTURE:
+/sessions/ecstatic-upbeat-ramanujan/mnt/outputs/kct-fitness/backend/
+
+ROOT FILES:
+  .env                           - Environment variables (development)
+  .env.example                   - Environment template
+  .gitignore                     - Git ignore rules
+  package.json                   - Dependencies and scripts
+  README.md                      - Complete documentation
+  QUICKSTART.md                  - 5-minute setup guide
+  FILE_MANIFEST.txt              - This file

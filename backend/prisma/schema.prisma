@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ─── DATABASE PROVIDER ──────────────────────────────────────────────────────
+// LOCAL �EV:  provider = "sqlite",     DATABASE_URL = "file:./dev.db"
+// PRODUCTION: provider = "postgresql", DATABASE_URL = "<Supabase connection string>"
+//
+// To switch to production PostgreSQL:
+//   1. Change provider below from "sqlite" to "postgresql"
+//   2. Set DATABASE_URL in Railway to your Supabase connection string
+//   3. Run: npx prisma migrate deploy
+// ─────────────────────────────────────────────────────────────────────────────
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String    @id @default(uuid())
+  name               String
+  email              String    @unique
+  password           String
+  role               String    @default("USER")
+  skillLevel         String    @default("BEGINNER")
+  equipment          String    @default("[]")
+  workoutDuration    Int       @default(45)
+  goals              String    @default("[]")
+  subscriptionStatus String    @default("TRIAL")
+  trialStartDate     DateTime  @default(now())
+  stripeCustomerId   String?
+  stripeSubscriptionId String?
+  fcmToken           String?
+  workoutLogs        UserWorkoutLog[]
+  progressPhotos     ProgressPhoto[]
+  badges             Badge[]
+  groupMemberships   GroupMember[]
+  leaderboardEntries Leaderboard[]
+  createdWorkouts    Workout[]
+  createdGroups      Group[]
+  createdChallenges  Challenge[]
+  createdSessions    ScheduledSession[]
+  refreshTokens      RefreshToken[]
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+model Exercise {
+  id            String    @id @default(uuid())
+  name          String
+  description   String
+  muscleGroups  String    @default("[]")
+  equipment     String    @default("[]")
+  difficulty    String    @default("BEGINNER")
+  videoUrl      String?
+  alternatives  String    @default("[]")
+  beginnerMod   String?
+  advancedProg  String?
+  workoutExercises WorkoutExercise[]
+  exerciseLogs  ExerciseLog[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Workout {
+  id            String    @id @default(uuid())
+  name          String
+  description   String?
+  duration      Int
+  difficulty    String    @default("BEGINNER")
+  equipment     String    @default("[]")
+  createdById   String?
+  createdBy     User?     @relation(fields: [createdById], references: [id])
+  isAIGenerated Boolean   @default(false)
+  exercises     WorkoutExercise[]
+  logs          UserWorkoutLog[]
+  challenges    Challenge[]
+  sessions      ScheduledSession[]
+  leaderboards  Leaderboard[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model WorkoutExercise {
+  id          String    @id @default(uuid())
+  workoutId   String
+  workout     Workout   @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  exerciseId  String
+  exercise    Exercise  @relation(fields: [exerciseId], references: [id])
+  sets        Int       @default(3)
+  reps        Int       @default(10)
+  weight      Float?
+  restSeconds Int       @default(60)
+  order       Int       @default(0)
+}
+
+model UserWorkoutLog {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  workoutId     String?
+  workout       Workout?  @relation(fields: [workoutId], references: [id])
+  dateCompleted DateTime  @default(now())
+  duration      Int
+  notes         String?
+  exerciseLogs  ExerciseLog[]
+}
+
+model ExerciseLog {
+  id                 String    @id @default(uuid())
+  userWorkoutLogId   String
+  userWorkoutLog     UserWorkoutLog @relation(fields: [userWorkoutLogId], references: [id], onDelete: Cascade)
+  exerciseId         String
+  exercise           Exercise  @relation(fields: [exerciseId], references: [id])
+  setsCompleted      Int
+  repsCompleted      Int
+  weightUsed         Float?
+}
+
+model Group {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  location    String?
+  members     GroupMember[]
+  sessions    ScheduledSession[]
+  leaderboards Leaderboard[]
+  createdAt   DateTime  @default(now())
+}
+
+model GroupMember {
+  id        String    @id @default(uuid())
+  groupId   String
+  group     Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  role      String    @default("MEMBER")
+  joinedAt  DateTime  @default(now())
+  @@unique([groupId, userId])
+}
+
+model Challenge {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  workoutId   String?
+  workout     Workout?  @relation(fields: [workoutId], references: [id])
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  startDate   DateTime
+  endDate     DateTime
+  leaderboards Leaderboard[]
+  createdAt   DateTime  @default(now())
+}
+
+model Leaderboard {
+  id          String    @id @default(uuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  workoutId   String?
+  workout     Workout?  @relation(fields: [workoutId], references: [id])
+  challengeId String?
+  challenge   Challenge? @relation(fields: [challengeId], references: [id])
+  groupId     String?
+  group       Group?    @relation(fields: [groupId], references: [id])
+  score       Float     @default(0)
+  dateLogged  DateTime  @default(now())
+}
+
+model ProgressPhoto {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  photoUrl     String
+  angle        String    @default("FRONT")
+  weight       Float?
+  bodyFat      Float?
+  dateUploaded DateTime  @default(now())
+}
+
+model Badge {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  badgeType String
+  earnedAt  DateTime  @default(now())
+}
+
+model ScheduledSession {
+  id            String    @id @default(uuid())
+  workoutId     String
+  workout       Workout   @relation(fields: [workoutId], references: [id])
+  groupId       String?
+  group         Group?    @relation(fields: [groupId], references: [id])
+  scheduledTime DateTime
+  createdById   String
+  createdBy     User      @relation(fields: [createdById], references: [id])
+  createdAt     DateTime  @default(now())
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+}

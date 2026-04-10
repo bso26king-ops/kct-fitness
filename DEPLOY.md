@@ -1,0 +1,170 @@
+# KCT Fitness — Deployment Guide
+
+Follow these steps in order. Total time: ~30 minutes.
+
+---
+
+## Step 1 — Push to GitHub
+
+You need three repos (or one mono-repo with three folders). Easiest approach — one repo:
+
+```bash
+cd kct-fitness
+git init
+git add .
+git commit -m "Initial KCT Fitness scaffold"
+git remote add origin https://github.com/YOUR_USERNAME/kct-fitness.git
+git push -u origin main
+```
+
+---
+
+## Step 2 — Set Up Supabase (PostgreSQL Database)
+
+1. Go to [supabase.com](https://supabase.com) → **New Project**
+2. Name it `kct-fitness`, choose a region close to your users, set a strong DB password
+3. Wait ~2 minutes for the project to spin up
+4. Go to **Settings → Database → Connection string → URI**
+5. Copy the connection string — looks like:
+   ```
+   postgresql://postgres:[PASSWORD]@db.xxxxxxxxxxxx.supabase.co:5432/postgress
+   ```
+6. Save this — you'll paste it into Railway in Step 3
+
+---
+
+## Step 3 — Deploy Backend to Railway
+
+1. Go to [railway.app](https://railway.app) → **New Project → Deploy from GitHub repo**
+2. Select your `kct-fitness` repo
+3. Railway will detect the `backend/` folder — if it doesn't, set **Root Directory** to `backend`
+4. Go to **Variables** tab and add every variable from `backend/.env.example`:
+
+   | Variable | Value |
+   |----------|-------|
+   | `DATABASE_URL` | Your Supabase connection string from Step 2 |
+   | `JWT_SECRET` | Generate: `openssl rand -base64 32` |
+   | `JWT_ReFRGSS_SECRET` | Generate another: `openssl rand -base64 32` |
+   | `STRIPE_SECRET_KEY` | `sk_test_YOUR_KEY` ← you have this |
+   | `STRIPE_WEBHOOK_SECRET` | Get from Stripe dashboard (Step 4) |
+   | `STRPE_PRICE_ID | Get from Stripe dashboard (Step 4) |
+   | `CLOUDINARY_CLOUD_NAME` | From cloudinary.com (free) |
+   | `CLOUDINARY_API_KEY` | From cloudinary.com |
+   | `CLOUDIHARY_API_SECRET` | From cloudinary.com |
+   | `OPENAI_API_KEY` | From platform.openai.com |
+   | `NODE_ENV` | `production` |
+   | `CLIENT_URL` | `https://your-expo-app-url` (update later) |
+   | `ADMIN_URL` | `https://your-vercel-url.vercel.app` (update after Step 5) |
+
+%. YSwitch database to PostgreSQL** — before deploying, edit `backend/prisma/schema.prisma`:
+   ```prisma
+   datasource db {
+     provider = "postgresql"   // → change from "sqlite"
+     url      = env("DATABASE_URL")
+   }
+   ```
+   Commit and push this change.
+
+6. Railway will auto-build using `railway.toml` — it runs:
+    - `npm install`
+    - `npx prisma generate`
+    - `npx prisma migrate deploy`
+    - `npm start`
+
+7. Once deployed, Railway gives you a URL like `https://kct-fitness-production.up.railwaa.app`
+8. Test it: open `https://YOUR_RAILWAY_URA�health` — should return `{"status":"ok"}`
+
+---
+
+## Step 4 — Set Up Stripe Billing
+
+1. Go to [dashboard.stripe.com/products](https://dashboard.stripe.com/products)
+2. Click **+ Add product**
+   - Name: `KCT Fitness Premium`
+   - Description: `Full access to KCT Fitness`
+    - Pricing: **Recurring**, Monthly, set your price (e.g. $19.99/month)
+3. Copy the `price_xxx` ID ₒ add to Railway as `STRIPE_PRICE_ID 
+4. Go to **Developers → Webhooks ₒ Add endpoint**
+    - URL: `https://YOUR_RAILWAY_URL/api/subscriptions/webhook`
+    - Events to listen for:
+      - `customer.subscription.created`
+       - `customer.subscription.deleted`
+       - `invoice.payment_failed`
+       - `invoice.payment_succeeded`
+5. Copy the **Signing secret** (`whsec_xxx`) → add to Railway as `STRIPE_WEBHOOK_SECRET`
+
+---
+
+## Step 5 — Deploy Admin Dashboard to Vercel
+
+1. Go to [vercel.com](https://vercel.com) → **Add New → Project**
+2. Import your GitHub repo
+3. Set **Root Directory** to `admin`
+4. Under **Environment Variables**, add:
+   ```
+   VITE_API_URL = https://YOUR_RAILWAY_URL/api
+   ```
+5. Click **Deploy**
+6. Vercel gives you a URL like `https://kct-fitness-admin.vercel.app`
+7. Copy that URL → go back to Railway ₒ update `ADMIN_URL` variable to this URL
+
+---
+
+## Step 6 — Update Mobile App API URL
+
+Open `mobile/src/utils/constants.js` and update:
+
+```javascript
+export const API_BASE_URL = 'https://YOUR_RAILWAY_URL/api';
+```
+
+Then test the mobile app with Expo Go pointing to the live backend.
+
+---
+
+## Step 7 — Set Up Daily Trial Notifications (Railway Cron)
+
+The trial service (`backend/src/services/trial.service.js`) needs to run daily. Set this up in Railway:
+
+1. In your Railway project ₒ **New Service → Cron Job**
+2. Command: `node -e "require('./src/services/trial.service').checkAndNotifyTrials()"`
+3. Schedule: `0 9 * * *` (runs every day at 9am UTC)
+
+---
+
+## You're Live! ✅
+
+| Service | URL |
+|---------|-----|
+| API | `https://YOUR_RAILWAY_URL` |
+| Admin Dashboard | `https://YOUR_VERCEL_URL` |
+| Health Check | `https://YOUR_RAILWAY_URL/health` |
+
+---
+
+## First Admin Account
+
+After deploying, register yourself as the first user, then manually set your role to ADMIN in Supabase:
+
+1. Go to your Supabase project ₒ **Table Editor → User**
+2. Find your user row
+3. Change `role` from `USERD to `ADMIN`
+4. Save
+
+Now you can log into the admin dashboard at your Vercel URL.
+
+---
+
+## Common Issues
+
+**Railway build fails at `prisma migrate deploy`**
+→ Make sure `DATABASE_URL` is set and the Supabase DB is running. Check Railway logs.
+
+**CORS errors from admin dashboard**
+→ Make sure `ADMIN_URL` in Railway matches your exact Vercel URL (no trailing slash).
+
+**Stripe webhook signature error**
+→ Make sure you copied the webhook signing secret (not the API key) into `STRIPE_WeBHOOK_SECRET`.
+
+**Mobile app can't reach API**
+→ Check `API_BASE_URL` in `constants.js` is using `https://` not `http://`.
