@@ -2,8 +2,8 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// ─── DATABASE PROVIDER ──────────────────────────────────────────────────────
-// LOCAL �EV:  provider = "sqlite",     DATABASE_URL = "file:./dev.db"
+// ─── DATABASE PROVIDER ───────────────────────────────────────────────────────
+// LOCAL DEV:  provider = "sqlite",     DATABASE_URL = "file:./dev.db"
 // PRODUCTION: provider = "postgresql", DATABASE_URL = "<Supabase connection string>"
 //
 // To switch to production PostgreSQL:
@@ -12,8 +12,9 @@ generator client {
 //   3. Run: npx prisma migrate deploy
 // ─────────────────────────────────────────────────────────────────────────────
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
