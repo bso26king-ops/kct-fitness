@@ -54,7 +54,7 @@ async function createSubscription(req, res, next) {
       cancel_url: `${process.env.CLIENT_URL}/subscription/cancel`,
       metadata: {
         userId: req.userId,
-        },
+      },
     });
 
     res.json({
