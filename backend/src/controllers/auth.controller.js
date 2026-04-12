@@ -330,7 +330,32 @@ async function getMe(req, res, next) {
  */
 async function updateProfile(req, res, next) {
   try {
-    const { name, skillLevel, equipment, workoutDuration, goals,  equipment: JSON.parse(user.equipment || '[]'),
+    const { name, skillLevel, equipment, workoutDuration, goals, fcmToken } = req.body;
+
+    const user = await prisma.user.update({
+      where: { id: req.userId },
+      data: {
+        ...(name && { name }),
+        ...(skillLevel && { skillLevel }),
+        ...(equipment && { equipment: JSON.stringify(equipment) }),
+        ...(workoutDuration && { workoutDuration }),
+        ...(goals && { goals: JSON.stringify(goals) }),
+        ...(fcmToken && { fcmToken }),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        skillLevel: true,
+        equipment: true,
+        workoutDuration: true,
+        goals: true,
+      },
+    });
+
+    res.json({
+      ...user,
+      equipment: JSON.parse(user.equipment || '[]'),
       goals: JSON.parse(user.goals || '[]'),
     });
   } catch (error) {
