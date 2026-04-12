@@ -33,9 +33,9 @@ export default api;
 
 // API methods
 export const authAPI = {
-  login: (email, password) => api.post('/admin/auth/login', { email, password }),
-  logout: () => api.post('/admin/auth/logout'),
-  getMe: () => api.get('/admin/auth/me'),
+  login: (email, password) => api.post('/auth/login', { email, password }),
+  logout: () => api.post('/auth/logout'),
+  getMe: () => api.get('/auth/me'),
 };
 
 export const exerciseAPI = {
