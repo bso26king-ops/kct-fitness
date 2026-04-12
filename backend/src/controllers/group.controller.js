@@ -1,1 +1,241 @@
-Y29uc3QgcHJpc21hID0gcmVxdWlyZSgnLi4vbGliL3ByaXNtYScpOwpjb25zdCB7IHY0OiB1dWlkdjQgfSA9IHJlcXVpcmUoJ3V1aWQnKTsKCi8qKgogKiBHZXQgYWxsIGdyb3VwcyB3aXRoIHBhZ2luYXRpb24KICogQHBhcmFtIHtvYmplY3R9IHJlcSAtIEV4cHJlc3MgcmVxdWVzdAogKiBAcGFyYW0ge29iamVjdH0gcmVzIC0gRXhwcmVzcyByZXNwb25zZQogKiBAcGFyYW0ge2Z1bmN0aW9ufSBuZXh0IC0gRXhwcmVzcyBuZXh0CiAqLwphc3luYyBmdW5jdGlvbiBnZXRHcm91cHMocmVxLCByZXMsIG5leHQpIHsKICB0cnkgewogICAgY29uc3QgeyBza2lwID0gMCwgdGFrZSA9IDIwIH0gPSByZXEucXVlcnk7CgogICAgY29uc3QgZ3JvdXBzID0gYXdhaXQgcHJpc21hLmdyb3VwLmZpbmRNYW55KHsKICAgICAgc2tpcDogcGFyc2VJbnQoc2tpcCksCiAgICAgIHRha2U6IHBhcnNlSW50KHRha2UpLAogICAgICBpbmNsdWRlOiB7CiAgICAgICAgY3JlYXRlZEJ5OiB7IHNlbGVjdDogeyBpZDogdHJ1ZSwgbmFtZTogdHJ1ZSB9IH0sCiAgICAgICAgbWVtYmVyczogeyBzZWxlY3Q6IHsgdXNlcklkOiB0cnVlIH0gfSwKICAgICAgICBfY291bnQ6IHsgc2VsZWN0OiB7IG1lbWJlcnM6IHRydWUgfSB9LAogICAgICB9LAogICAgICBvcmRlckJ5OiB7IGNyZWF0ZWRBdDogJ2Rlc2MnIH0sCiAgICB9KTsKCiAgICBjb25zdCB0b3RhbCA9IGF3YWl0IHByaXNtYS5ncm91cC5jb3VudCgpOwoKICAgIHJlcy5qc29uKHsKICAgICAgZ3JvdXBzLAogICAgICBwYWdpbmF0aW9uOiB7IHNraXA6IHBhcnNlSW50KHNraXApLCB0YWtlOiBwYXJzZUludCh0YWtlKSwgdG90YWwgfSwKICAgIH0pOwogIH0gY2F0Y2ggKGVycm9yKSB7CiAgICBuZXh0KGVycm9yKTsKICB9Cn0KCi8qKgogKiBDcmVhdGUgYSBuZXcgZ3JvdXAKICogQHBhcmFtIHtvYmplY3R9IHJlcSAtIEV4cHJlc3MgcmVxdWVzdAogKiBAcGFyYW0ge29iamVjdH0gcmVzIC0gRXhwcmVzcyByZXNwb25zZQogKiBAcGFyYW0ge2Z1bmN0aW9ufSBuZXh0IC0gRXhwcmVzcyBuZXh0CiAqLwphc3luYyBmdW5jdGlvbiBjcmVhdGVHcm91cChyZXEsIHJlcywgbmV4dCkgewogIHRyeSB7CiAgICBjb25zdCB7IG5hbWUsIGRlc2NyaXB0aW9uLCBsb2NhdGlvbiB9ID0gcmVxLmJvZHk7CgogICAgY29uc3QgZ3JvdXAgPSBhd2FpdCBwcmlzbWEuZ3JvdXAuY3JlYXRlKHsKICAgICAgZGF0YTogewogICAgICAgIGlkOiB1dWlkdjQoKSwogICAgICAgIG5hbWUsCiAgICAgICAgZGVzY3JpcHRpb24sCiAgICAgICAgbG9jYXRpb24sCiAgICAgICAgY3JlYXRlZEJ5SWQ6IHJlcS51c2VyLmlkLAogICAgICAgIG1lbWJlcnM6IHsKICAgICAgICAgIGNyZWF0ZTogWwogICAgICAgICAgICB7CiAgICAgICAgICAgICAgdXNlcklkOiByZXEudXNlci5pZCwKICAgICAgICAgICAgfSwKICAgICAgICAgIF0sCiAgICAgICAgfSwogICAgICB9LAogICAgfSk7CgogICAgcmVzLnN0YXR1cygyMDEpLmpzb24oZ3JvdXApOwogIH0gY2F0Y2ggKGVycm9yKSB7CiAgICBuZXh0KGVycm9yKTsKICB9Cn0K
+const prisma = require('../lib/prisma');
+const { v4: uuidv4 } = require('uuid');
+
+/**
+ * Get all groups with pagination
+ * @param {object} req - Express request
+ * @param {object} res - Express response
+ * @param {function} next - Express next
+ */
+async function getGroups(req, res, next) {
+  try {
+    const { skip = 0, take = 20 } = req.query;
+
+    const groups = await prisma.group.findMany({
+      skip: parseInt(skip),
+      take: parseInt(take),
+      include: {
+        createdBy: { select: { id: true, name: true } },
+        members: { select: { userId: true } },
+        _count: { select: { members: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const total = await prisma.group.count();
+
+    res.json({
+      groups,
+      pagination: { skip: parseInt(skip), take: parseInt(take), total },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Create a new group
+ * @param {object} req - Express request
+ * @param {object} res - Express response
+ * @param {function} next - Express next
+ */
+async function createGroup(req, res, next) {
+  try {
+    const { name, description, location } = req.body;
+
+    const group = await prisma.group.create({
+      data: {
+        id: uuidv4(),
+        name,
+        description,
+        location,
+        createdById: req.userId,
+        members: {
+          create: {
+            id: uuidv4(),
+            userId: req.userId,
+            role: 'ADMIN',
+          },
+        },
+      },
+      include: {
+        createdBy: { select: { id: true, name: true } },
+        members: true,
+      },
+    });
+
+    res.status(201).json(group);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Get group by ID
+ * @param {object} req - Express request
+ * @param {object} res - Express response
+ * @param {function} next - Express next
+ */
+async function getGroupById(req, res, next) {
+  try {
+    const { id } = req.params;
+
+    const group = await prisma.group.findUnique({
+      where: { id },
+      include: {
+        createdBy: { select: { id: true, name: true } },
+        members: {
+          include: {
+            user: { select: { id: true, name: true, email: true } },
+          },
+        },
+      },
+    });
+
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found' });
+    }
+
+    res.json(group);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Join a group
+ * @param {object} req - Express request
+ * @param {object} res - Express response
+ * @param {function} next - Express next
+ */
+async function joinGroup(req, res, next) {
+  try {
+    const { groupId } = req.params;
+
+    // Check if already a member
+    const existing = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId: req.userId } },
+    });
+
+    if (existing) {
+      return res.status(409).json({ error: 'Already a member of this group' });
+    }
+
+    const member = await prisma.groupMember.create({
+      data: {
+        id: uuidv4(),
+        groupId,
+        userId: req.userId,
+        role: 'MEMBER',
+      },
+    });
+
+    res.status(201).json(member);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Get group leaderboard/feed
+ * @param {object} req - Express request
+ * @param {object} res - Express response
+ * @param {function} next - Express next
+ */
+async function getGroupFeed(req, res, next) {
+  try {
+    const { groupId } = req.params;
+    const { skip = 0, take = 20 } = req.query;
+
+    // Verify user is member
+    const membership = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId: req.userId } },
+    });
+
+    if (!membership) {
+      return res.status(403).json({ error: 'Not a member of this group' });
+    }
+
+    // Get group members
+    const members = await prisma.groupMember.findMany({
+      where: { groupId },
+      select: { userId: true },
+    });
+
+    const memberIds = members.map(m => m.userId);
+
+    // Get leaderboard for this group
+    const leaderboard = await prisma.leaderboard.groupBy({
+      by: ['userId'],
+      where: {
+        groupId,
+        userId: { in: memberIds },
+      },
+      _sum: { score: true },
+      orderBy: { _sum: { score: 'desc' } },
+      skip: parseInt(skip),
+      take: parseInt(take),
+    });
+
+    // Get user details
+    const userIds = leaderboard.map(l => l.userId);
+    const users = await prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: { id: true, name: true, email: true },
+    });
+
+    const userMap = Object.fromEntries(users.map(u => [u.id, u]));
+
+    const feed = leaderboard.map((entry, idx) => ({
+      rank: idx + 1 + parseInt(skip),
+      user: userMap[entry.userId],
+      score: entry._sum.score,
+    }));
+
+    res.json(feed);
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Post a message in group (placeholder for message system)
+ * @param {object} req - Express request
+ * @param {object} res - Express response
+ * @param {function} next - Express next
+ */
+async function postGroupMessage(req, res, next) {
+  try {
+    const { groupId } = req.params;
+    const { message } = req.body;
+
+    // Verify user is member
+    const membership = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId: req.userId } },
+    });
+
+    if (!membership) {
+      return res.status(403).json({ error: 'Not a member of this group' });
+    }
+
+    // This is a placeholder. In production, implement a messages table
+    res.json({
+      message: 'Message posted',
+      groupId,
+      userId: req.userId,
+      content: message,
+      timestamp: new Date(),
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = {
+  getGroups,
+  createGroup,
+  getGroupById,
+  joinGroup,
+  getGroupFeed,
+  postGroupMessage,
+};
