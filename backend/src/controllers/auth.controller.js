@@ -115,7 +115,7 @@ async function login(req, res, next) {
     });
 
     res.json({
-  2   message: 'Login successful',
+      message: 'Login successful',
       user: {
         id: user.id,
         name: user.name,
