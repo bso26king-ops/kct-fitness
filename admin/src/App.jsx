@@ -44,47 +44,23 @@ function AppContent() {
         <Route path="exercises" element={<ExerciseLibraryPage />} />
         <Route path="workouts" element={<WorkoutBuilderPage />} />
         <Route path="challenges" element={<ChallengeManagerPage />} />
-        <Route path="groups" eement={<GroupManagerPage />} />
-        <Route path="users" element={<UserManagerPage />} />
-        <Route path="sessions" element={<ScheduledSessionsPage />} />
-        <Route path="notifications" element={<NotificationCenterPage />} />
-        <Route path="analytics" element={<AnalyticsPage />} />
-        <Route path="subscriptions" element={<SubscriptionManagerPage />} />
-      </Routes>
-   );
-  }
- function AppContent() {
-  return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <ProtectedLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<OverviewPage />} />
-        <Route path="exercises" element={<ExerciseLibraryPage />} />
-        <Route path="workouts" element={<WorkoutBuilderPage />} />
-        <Route path="challenges" element={<ChallengeManagerPage />} />
         <Route path="groups" element={<GroupManagerPage />} />
         <Route path="users" element={<UserManagerPage />} />
         <Route path="sessions" element={<ScheduledSessionsPage />} />
         <Route path="notifications" element={<NotificationCenterPage />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="subscriptions" element={<SubscriptionManagerPage />} />
-      </Routes>
-    );
-  }
-Dexport default function App() {
+      </Route>
+    </Routes>
+  );
+}
+
+export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <AppContent />
       </BrowserRouter>
     </AuthProvider>
-   );
-  }
-  }
+  );
+}
