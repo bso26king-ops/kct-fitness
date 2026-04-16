@@ -19,7 +19,7 @@ api.interceptors.request.use(
 
 // Response interceptor for 401
 api.interceptors.response.use(
-  (response) => response,
+  (response) => response.data,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('adminToken');
