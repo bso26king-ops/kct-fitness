@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function DataTable({ columns, data, onEdit, onDelete }) {
+export default function DataTable({ columns, data = [], onEdit, onDelete }) {
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -84,7 +84,7 @@ export default function DataTable({ columns, data, onEdit, onDelete }) {
             disabled={currentPage === 1}
             className="px-3 py-1 bg-card hover:bg-secondary text-text-primary rounded disabled:opacity-50"
           >
-            ← Prev
+            â Prev
           </button>
           <span className="text-text-secondary text-sm">
             Page {currentPage} of {totalPages}
@@ -94,7 +94,7 @@ export default function DataTable({ columns, data, onEdit, onDelete }) {
             disabled={currentPage === totalPages}
             className="px-3 py-1 bg-card hover:bg-secondary text-text-primary rounded disabled:opacity-50"
           >
-            Next →
+            Next â
           </button>
         </div>
       </div>
