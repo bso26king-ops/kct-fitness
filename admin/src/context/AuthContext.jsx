@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
 
   const checkAuth = async () => {
     try {
-      const { data } = await authAPI.getMe();
+      const data = await authAPI.getMe();
       setUser(data.user);
     } catch (error) {
       localStorage.removeItem('adminToken');
@@ -31,7 +31,7 @@ export function AuthProvider({ children }) {
   };
 
   const login = async (email, password) => {
-    const { data } = await authAPI.login(email, password);
+    const data = await authAPI.login(email, password);
     localStorage.setItem('adminToken', data.accessToken);
     setToken(data.accessToken);
     setUser(data.user);
