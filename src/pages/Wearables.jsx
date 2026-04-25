@@ -262,10 +262,10 @@ function ThirdPartyCard({ integration, connected, onToggle }) {
       </div>
       <div style={{ flex: 1 }}>
         <div style={{ fontWeight: 700, fontSize: 13, letterSpacing: 0.5, marginBottom: 2 }}>{integration.name}</div>
-        <div style={{ fontSize: 10, color: T.whiteDim }}>{integration.desc</div>
+        <div style={{ fontSize: 10, color: T.whiteDim }}>{integration.desc}</div>
       </div>
       <Btn v={connected ? 'success' : 'ghost'} sz="sm" onClick={handleConnect}>
-        {connected ? 'Connected ✓8' : 'Connect'}
+        {connected ? 'Connected ✓' : 'Connect'}
       </Btn>
     </div>
   );
@@ -392,10 +392,10 @@ export default function Wearables() {
         <div style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 2, padding: '14px 16px', marginTop: 8 }}>
           <div style={{ fontSize: 9, color: T.blue, letterSpacing: 2, textTransform: 'uppercase', fontWeight: 700, marginBottom: 6 }}>How syncing works</div>
           <div style={{ fontSize: 11, color: T.whiteDim, lineHeight: 1.7 }}>
-            {ISIOS
+            {IS_IOS
               ? 'Apple Health reads workouts, steps, heart rate and calories directly from the Health app on your iPhone. Tap Connect and approve access when prompted.'
               : IS_ANDROID
-              ? 'Google Health Connect aggregates data from all your Android health and fitness apps — including Samsung Health └ in one place.'
+              ? 'Google Health Connect aggregates data from all your Android health and fitness apps — including Samsung Health — in one place.'
               : 'Install the KCT Fitness app on your iPhone or Android device to enable health platform sync.'
             }
           </div>
