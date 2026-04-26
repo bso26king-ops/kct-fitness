@@ -7,6 +7,7 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
     rollupOptions: {
+      external: ['@perfood/capacitor-healthkit', '@perfood/capacitor-health-connect'],
       output: {
         manualChunks: undefined,
       },
