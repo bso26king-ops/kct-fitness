@@ -48,6 +48,11 @@ jobs:
         npx cap add android
         git checkout HEAD -- android/kct-fitness-release.keystore.b64
 
+    - name: Set Target SDK 35
+      run: |
+        sed -i 's/targetSdkVersion = 34/targetSdkVersion = 35/' android/variables.gradle
+        sed -i 's/compileSdkVersion = 34/compileSdkVersion = 35/' android/variables.gradle
+
     - name: Copy app icons into Android res
       run: |
         if [ -d "icons/android-res" ]; then
