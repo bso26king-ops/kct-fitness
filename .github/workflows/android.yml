@@ -62,7 +62,7 @@ jobs:
 
     - name: Decode release keystore
       run: |
-        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > kct-fitness-release.keystore
+        printf '%s' "${{ secrets.KEYSTORE_BASE64 }}" | base64 --ignore-garbage --decode > kct-fitness-release.keystore
 
     - name: Sync Capacitor (web assets to Android)
       run: npx cap sync android
