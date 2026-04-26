@@ -5,7 +5,7 @@ export default function KCTMark({ size = 48 }) {
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none">
       <polygon points="50,4 96,27 96,73 50,96 4,73 4,27" fill={T.red} stroke={T.red} strokeWidth="1" />
       <text x="50" y="60" textAnchor="middle" fill="#fff"
-        style={{ font: `900 ${Math.round(size * 0.42]}px 'Barlow Condensed', sans-serif`, letterSpacing: 1 }}>
+        style={{ font: `900 ${Math.round(size * 0.42)}px 'Barlow Condensed', sans-serif`, letterSpacing: 1 }}>
         KCT
       </text>
     </svg>
