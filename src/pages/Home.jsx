@@ -45,7 +45,7 @@ export default function Home() {
       <div style={{ padding: '16px 18px 14px', background: T.panel, borderBottom: `1px solid ${T.line}` }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
           <div>
-            <div style={{ fontSize: 9, color: T.whiteDim, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 2 }}>Welcome back</div>
+            <div style={{ fontSize: 9, color: T.whiteDim, letterSpacing: 3, textTransform: 'uppercase', marginBottom: 2 }}>Welcome back,</div>
             <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: -0.5 }}>{(user?.name || 'Athlete').toUpperCase()}</div>
           </div>
           <div style={{ display: 'flex', gap: 5, flexDirection: 'column', alignItems: 'flex-end' }}>
@@ -69,7 +69,7 @@ export default function Home() {
         <div style={{ fontSize: 9, letterSpacing: 3, color: T.whiteDim, fontWeight: 700, textTransform: 'uppercase', marginBottom: 10 }}>Today's Workout</div>
         {todayW ? (
           <div
-            onClick={() => nav('/workout', {+ state: { workout: todayW } })}
+            onClick={() => nav('/workout', { state: { workout: todayW } })}
             style={{ background: 'linear-gradient(135deg,#1c0000 0%,#2d0505 100%)', border: `1px solid ${T.red}`, borderRadius: 2, padding: 20, cursor: 'pointer', position: 'relative', overflow: 'hidden', transition: 'border-color .15s' }}
             onMouseEnter={e => e.currentTarget.style.borderColor = '#ff4444'}
             onMouseLeave={e => e.currentTarget.style.borderColor = T.red}
@@ -101,9 +101,9 @@ export default function Home() {
       {/* Stats row — only show if we have real data */}
       {stats && (
         <div style={{ padding: '14px 18px 0', display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
-          <StatCard label="Workouts"   value={s.totalWorkouts || 0}           icon="🏋️" />
-          <StatCard label="Streak"     value={`${s.streak || 0}d`}            icon="🔥" color={T.green} />
-          <StatCard label="Goals"      value={s.goalsCount || 0}              icon="🎯" />
+          <StatCard label="Workouts"   value={s.totalWorkouts || 0}          icon="🏋️" />
+          <StatCard label="Streak"     value={`${s.streak || 0}d`}           icon="🔥" color={T.green} />
+          <StatCard label="Goals"      value={s.goalsCount || 0}             icon="🎯" />
           <StatCard label="Compliance" value={`${s.complianceRate || 0}%`}   icon="📊" color={T.gold} />
         </div>
       )}
@@ -137,7 +137,7 @@ export default function Home() {
             { l: 'Full Program', icon: '📋', path: '/train' },
             { l: 'Kickboxing',   icon: '🥊', path: '/kickboxing' },
             { l: 'My Calendar',  icon: '📅', path: '/calendar' },
-            { l: 'My Goals',n     icon: '🏯', path: '/goals' },
+            { l: 'My Goals',     icon: '🎯', path: '/goals' },
           ].map(({ l, icon, path }) => (
             <div key={l} onClick={() => nav(path)}
               style={{ background: T.panel, border: `1px solid ${T.line}`, borderRadius: 2, padding: '13px 14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10, transition: 'border-color .15s' }}
