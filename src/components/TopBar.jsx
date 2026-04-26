@@ -14,16 +14,37 @@ export default function TopBar({ title, backTo, right }) {
       padding: '11px 18px', display: 'flex', alignItems: 'center',
       justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50, flexShrink: 0,
     }}>
+      {/* Left: logo or back */}
       {backTo ? (
-        <button onClick={() => nav(backTo)} style={{ background: 'none', border: 'none', color: T.whiteMid, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 700, fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 6 }}>‹ Back</button>
+        <button onClick={() => nav(backTo)} style={{
+          background: 'none', border: 'none', color: T.whiteMid, cursor: 'pointer',
+          fontFamily: 'inherit', fontWeight: 700, fontSize: 11, letterSpacing: 1,
+          textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 6,
+        }}>
+          ‹ Back
+        </button>
       ) : (
         <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
           <KCTMark size={26} />
-          <div><div style={{ fontSize: 13, fontWeight: 900, letterSpacing: 3, lineHeight: 1 }}>KCT</div><div style={{ fontSize: 7, color: T.whiteDim, letterSpacing: 2, textTransform: 'uppercase' }}>FITNESS</div></div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 900, letterSpacing: 3, lineHeight: 1 }}>KCT</div>
+            <div style={{ fontSize: 7, color: T.whiteDim, letterSpacing: 2, textTransform: 'uppercase' }}>FITNESS</div>
+          </div>
         </div>
       )}
-      {title && (<div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', fontSize: 12, fontWeight: 900, letterSpacing: 2, textTransform: 'uppercase' }}>{title}</div>)}
-      <div style={{ display: 'flex', gap: 7, alignItems: 'center' }}>{right}<Btn v="ghost" sz="sm" onClick={logout}>Out</Btn></div>
+
+      {/* Center title */}
+      {title && (
+        <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', fontSize: 12, fontWeight: 900, letterSpacing: 2, textTransform: 'uppercase' }}>
+          {title}
+        </div>
+      )}
+
+      {/* Right slot */}
+      <div style={{ display: 'flex', gap: 7, alignItems: 'center' }}>
+        {right}
+        <Btn v="ghost" sz="sm" onClick={logout}>Out</Btn>
+      </div>
     </div>
   );
 }
