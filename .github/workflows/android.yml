@@ -43,7 +43,10 @@ jobs:
         sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools"
 
     - name: Add Android platform (Capacitor)
-      run: npx cap add android
+      run: |
+        rm -rf android
+        npx cap add android
+        git checkout HEAD -- android/kct-fitness-release.keystore.b64
 
     - name: Copy app icons into Android res
       run: |
